@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="description" content="Developer workshop: GitHub, GitHub Copilot, Azure Content Understanding, CI/CD, architecture, and deployment." />
+<title>Build a Document Intelligence App — Developer Workshop</title>
+<script>
+  (() => {
+    const param = new URLSearchParams(window.location.search).get("scoutTheme");
+    const theme = param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  })();
+</script>
+<style>
+:root {
+  color-scheme: light;
+  --cp-bg: #f7f4ef;
+  --cp-bg-elevated: #fcfbf8;
+  --cp-surface: #ffffff;
+  --cp-surface-soft: #f5f5f5;
+  --cp-border: #dedede;
+  --cp-border-strong: #919191;
+  --cp-text: #242424;
+  --cp-text-muted: #5c5c5c;
+  --cp-text-soft: #6f6f6f;
+  --cp-accent: #b11f4b;
+  --cp-accent-hover: #9a1a41;
+  --cp-accent-soft: rgba(177, 31, 75, 0.08);
+  --cp-accent-fg: #ffffff;
+  --cp-success: #16a34a;
+  --cp-danger: #dc2626;
+  --cp-warning: #f59e0b;
+  --cp-link: #0078d4;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+  --cp-overlay: rgba(255, 255, 255, 0.8);
+  --cp-panel: rgba(255, 255, 255, 0.86);
+  --cp-panel-strong: rgba(255, 255, 255, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.55);
+  --cp-highlight: rgba(177, 31, 75, 0.12);
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --cp-bg: #3d3b3a;
+  --cp-bg-elevated: #343231;
+  --cp-surface: #292929;
+  --cp-surface-soft: #2e2e2e;
+  --cp-border: #474747;
+  --cp-border-strong: #5f5f5f;
+  --cp-text: #dedede;
+  --cp-text-muted: #919191;
+  --cp-text-soft: #b0b0b0;
+  --cp-accent: #fd8ea1;
+  --cp-accent-hover: #fb7b91;
+  --cp-accent-soft: rgba(253, 142, 161, 0.14);
+  --cp-accent-fg: #1a1a1a;
+  --cp-success: #4ade80;
+  --cp-danger: #f87171;
+  --cp-warning: #fbbf24;
+  --cp-link: #4da6ff;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+  --cp-overlay: rgba(41, 41, 41, 0.88);
+  --cp-panel: rgba(41, 41, 41, 0.72);
+  --cp-panel-strong: rgba(41, 41, 41, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.04);
+  --cp-highlight: rgba(253, 142, 161, 0.12);
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cp-bg);color:var(--cp-text);font-family:"Segoe UI",Aptos,Calibri,-apple-system,BlinkMacSystemFont,sans-serif;line-height:1.62}a{color:var(--cp-link)}img{max-width:100%;display:block}.mono,code,pre{font-family:Consolas,"Courier New",Courier,monospace}.shell{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:100vh}.side{position:sticky;top:0;height:100vh;padding:28px 20px;border-right:1px solid var(--cp-border);background:var(--cp-bg-elevated);display:flex;flex-direction:column;overflow:auto}.brand{display:flex;gap:12px;align-items:center;margin-bottom:28px}.brand-mark{width:40px;height:40px;border:1px solid var(--cp-accent);display:grid;place-items:center;color:var(--cp-accent);font:700 13px Consolas,monospace;border-radius:.625rem}.brand strong{display:block;font-size:14px}.brand span{font-size:12px;color:var(--cp-text-muted)}nav a{display:flex;gap:10px;text-decoration:none;color:var(--cp-text-muted);padding:9px 10px;border-left:2px solid transparent;font-size:13px}nav a:hover,nav a.active{color:var(--cp-text);border-color:var(--cp-accent);background:var(--cp-accent-soft)}.side-foot{margin-top:auto;padding-top:24px;color:var(--cp-text-muted);font-size:11px}.main{min-width:0}.hero{min-height:80vh;display:grid;align-items:center;padding:76px clamp(28px,6vw,96px);border-bottom:1px solid var(--cp-border);background:var(--cp-bg-elevated)}.eyebrow{font:700 12px Consolas,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--cp-accent)}h1{font-size:clamp(48px,7.5vw,104px);line-height:.92;letter-spacing:-.065em;margin:20px 0 28px;max-width:980px}h1 em{font-style:normal;color:var(--cp-accent)}.lede{font-size:clamp(18px,2vw,24px);max-width:760px;color:var(--cp-text-muted)}.hero-meta{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}.tag{border:1px solid var(--cp-border-strong);padding:6px 10px;border-radius:.625rem;font:12px Consolas,monospace;background:var(--cp-surface)}section{padding:72px clamp(28px,6vw,96px);border-bottom:1px solid var(--cp-border)}.section-head{display:grid;grid-template-columns:120px minmax(0,760px);gap:22px;margin-bottom:38px}.num{font:700 32px Consolas,monospace;color:var(--cp-accent)}h2{font-size:clamp(30px,4vw,52px);line-height:1.05;letter-spacing:-.03em;margin:0 0 12px}h3{font-size:20px;margin:0 0 10px}.muted{color:var(--cp-text-muted)}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.card{background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:16px;padding:24px;box-shadow:0 0 2px var(--cp-border),0 1px 2px var(--cp-border)}.span4{grid-column:span 4}.span6{grid-column:span 6}.span8{grid-column:span 8}.span12{grid-column:span 12}.kicker{font:700 11px Consolas,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--cp-accent);margin-bottom:9px}.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;align-items:stretch}.flow div{padding:18px 12px;border:1px solid var(--cp-border);background:var(--cp-surface);text-align:center;border-radius:.625rem}.flow b{display:block;font:700 12px Consolas,monospace;color:var(--cp-accent)}.figure{background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:16px;overflow:hidden}.figure img{width:100%;height:auto}.caption{padding:12px 16px;color:var(--cp-text-muted);font-size:12px;border-top:1px solid var(--cp-border)}.pricing{overflow:auto}.pricing table{width:100%;border-collapse:collapse;min-width:760px}.pricing th,.pricing td{padding:14px 12px;border-bottom:1px solid var(--cp-border);text-align:left;vertical-align:top}.pricing th{font:700 12px Consolas,monospace;color:var(--cp-accent)}.price{font-size:26px;font-weight:700}.callout{border-left:4px solid var(--cp-accent);background:var(--cp-accent-soft);padding:18px 20px;margin:24px 0}.steps{counter-reset:step;display:grid;gap:12px}.step{counter-increment:step;display:grid;grid-template-columns:52px 1fr;gap:16px;padding:20px;background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:16px}.step:before{content:counter(step,decimal-leading-zero);font:700 18px Consolas,monospace;color:var(--cp-accent)}pre{position:relative;overflow:auto;padding:20px;background:var(--cp-surface-soft);border:1px solid var(--cp-border);border-radius:.625rem;font-size:13px;line-height:1.55;white-space:pre}.copy{float:right;border:1px solid var(--cp-border-strong);background:var(--cp-surface);color:var(--cp-text);border-radius:.625rem;padding:5px 9px;cursor:pointer;font:11px Consolas,monospace}.copy:hover{border-color:var(--cp-accent)}.checklist{list-style:none;padding:0}.checklist li{padding:8px 0 8px 28px;position:relative}.checklist li:before{content:"□";position:absolute;left:0;color:var(--cp-accent);font-family:Consolas,monospace}.source-list li{margin:.5rem 0}.warning{color:var(--cp-warning)}.success{color:var(--cp-success)}.footer{padding:44px clamp(28px,6vw,96px);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:var(--cp-text-muted);font-size:12px}.skip{position:absolute;left:-9999px}.skip:focus{left:12px;top:12px;background:var(--cp-surface);padding:10px;z-index:10}.screen-only{display:block}@media(max-width:980px){.shell{grid-template-columns:1fr}.side{position:relative;height:auto;border-right:0;border-bottom:1px solid var(--cp-border)}nav{display:flex;overflow:auto}nav a{white-space:nowrap;border-left:0;border-bottom:2px solid transparent}.side-foot{display:none}.span4,.span6,.span8{grid-column:span 12}.section-head{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.hero{min-height:auto}}@media print{.side,.copy{display:none}.shell{display:block}section,.hero{break-inside:avoid;padding:28px}.hero{min-height:auto}a{color:var(--cp-text);text-decoration:none}}
+.figure object{width:100%;height:auto;aspect-ratio:1500/760;display:block}
+a:focus-visible,button:focus-visible{outline:3px solid var(--cp-accent);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+.shell,.main,.side,section,.grid,.grid>*,.step,.step>div,.pricing,.figure{min-width:0}
+.side nav{max-width:100%}
+pre{max-width:100%}
+.step{grid-template-columns:52px minmax(0,1fr)}
+@media(max-width:600px){.step{grid-template-columns:1fr}.step:before{margin-bottom:4px}section,.hero{padding-left:20px;padding-right:20px}}
+</style>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<div class="shell">
+<aside class="side">
+  <div class="brand"><div class="brand-mark">CU</div><div><strong>L400 Developer Workshop</strong><span>GitHub × Azure AI</span></div></div>
+  <nav aria-label="Workshop modules">
+    <a href="#github"><span>01</span> GitHub + CI/CD</a><a href="#copilot"><span>02</span> GitHub Copilot</a><a href="#cu"><span>03</span> Content Understanding</a><a href="#scenario"><span>04</span> Scenario</a><a href="#l400"><span>05</span> L400 deep dive</a><a href="#architecture"><span>06</span> Architecture</a><a href="#deploy"><span>07</span> Deploy</a><a href="#sources"><span>↗</span> Sources</a>
+  </nav>
+  <div class="side-foot">L400 public workshop guidance<br/>Updated 5 Sep 2026</div>
+</aside>
+<main id="content" class="main">
+<header class="hero">
+  <div><div class="eyebrow">L400 architecture + implementation lab · 3.5–4 hours</div><h1>Build a document app that can <em>explain itself.</em></h1><p class="lede">Trace every state transition from pull request to grounded citation. Implement and operate GitHub Actions, Azure Content Understanding, Azure AI Search, GPT‑5, managed identity, and failure recovery—not just the happy path.</p><div class="hero-meta"><span class="tag">L400 · source-level</span><span class="tag">Python 3.12 · FastAPI</span><span class="tag">React 19 · TypeScript</span><span class="tag">Bicep · Container Apps</span><span class="tag">OIDC · no secrets</span></div></div>
+</header>
+
+<section id="github">
+  <div class="section-head"><div class="num">01</div><div><div class="eyebrow">Collaborate → validate → release</div><h2>GitHub is the control plane for change.</h2><p class="muted">Git tracks versions; GitHub adds repositories, issues, pull requests, reviews, branch protection, and workflow automation. GitHub Actions composes events, jobs, and steps from YAML in <span class="mono">.github/workflows</span>.</p></div></div>
+  <div class="flow"><div><b>BRANCH</b>isolate a change</div><div><b>COMMIT</b>record intent</div><div><b>PULL REQUEST</b>review + discuss</div><div><b>REQUIRED CHECKS</b>CI + CodeQL</div><div><b>MERGE</b>release from main</div></div>
+  <div class="grid" style="margin-top:16px"><article class="card span4"><div class="kicker">CI · parallel</div><h3>Backend</h3><p>uv sync → Ruff → mypy → pytest + coverage → workflow policy tests.</p></article><article class="card span4"><div class="kicker">CI · parallel</div><h3>Frontend</h3><p>npm ci → lint → typecheck → unit tests → production build.</p></article><article class="card span4"><div class="kicker">CI · parallel</div><h3>Infrastructure</h3><p>Bicep compile/lint → IaC policy tests. CodeQL scans Python and JavaScript/TypeScript.</p></article></div>
+  <div class="callout"><b>Evidence moves with the process.</b> The complete repository → commit → pull request → checks → merge → deployment → frontend verification walkthrough appears in Module 07, with one screenshot and exit criterion per step.</div>
+</section>
+
+<section id="copilot">
+  <div class="section-head"><div class="num">02</div><div><div class="eyebrow">AI pair programmer → agentic workflows</div><h2>Copilot compresses the feedback loop—not accountability.</h2><p class="muted">Use inline completions for local edits, Chat for explanation, agent mode for multi-file changes, code review for PR feedback, and repository instructions to preserve engineering rules. Always verify generated code with tests and review.</p></div></div>
+  <div class="grid"><article class="card span4"><div class="kicker">Prompt pattern</div><h3>Context → intent → constraints</h3><p>Point to relevant files, state the exact outcome, name boundaries, and define evidence of completion.</p></article><article class="card span4"><div class="kicker">Repository policy</div><h3>Instructions are executable culture</h3><p>Keep security, testing, architecture, and review conventions near the code so humans and agents share the same contract.</p></article><article class="card span4"><div class="kicker">Verification</div><h3>Evidence before assertions</h3><p>Run targeted tests first, then the full suite, static analysis, CI, deployment smoke tests, and a real browser flow.</p></article></div>
+  <div class="pricing card span12" style="margin-top:16px"><div class="kicker">Pricing snapshot · official GitHub docs · accessed 5 Sep 2026</div><table><thead><tr><th>Plan</th><th>Price / month</th><th>Included AI credits</th><th>Fit</th></tr></thead><tbody><tr><td><b>Free</b></td><td class="price">$0</td><td>Allowance; 2,000 completions/month</td><td>Try completions, Chat, CLI, and auto model selection.</td></tr><tr><td><b>Pro</b></td><td class="price">$10</td><td>1,500 total monthly</td><td>Individual daily coding, model selection, cloud agent, code review.</td></tr><tr><td><b>Pro+</b></td><td class="price">$39</td><td>7,000 total monthly</td><td>Complex development with premium models and more agent usage.</td></tr><tr><td><b>Max</b></td><td class="price">$100</td><td>20,000 total monthly</td><td>Sustained high-volume individual agent workflows.</td></tr><tr><td><b>Business</b></td><td class="price">$19 / seat</td><td>1,900 per user (shared pool)</td><td>Organization policy, centralized management, content controls.</td></tr><tr><td><b>Enterprise</b></td><td class="price">$39 / seat</td><td>3,900 per user (shared pool)</td><td>GitHub Enterprise Cloud with enterprise capabilities and audit.</td></tr></tbody></table><p class="muted">Pricing and allowances can change. Paid-plan completions and next-edit suggestions remain unlimited; AI-credit overage for organizations is documented at $0.01/credit when enabled. Confirm before purchase.</p></div>
+</section>
+
+<section id="cu">
+  <div class="section-head"><div class="num">03</div><div><div class="eyebrow">Unstructured input → structured evidence</div><h2>Content Understanding turns messy files into a contract.</h2><p class="muted">An analyzer defines modalities, extraction, segmentation, fields, models, and output. The GA API <span class="mono">2025-11-01</span> supports production document, image, audio, and video workflows with Markdown or schema-aligned JSON output.</p></div></div>
+  <figure class="figure"><img src="assets/content-understanding-framework-2025.png" alt="Official Microsoft Content Understanding framework showing inputs, analyzers, structured output, and downstream services" loading="lazy"/><figcaption class="caption">Official Microsoft Learn framework: content extraction → segmentation → field extraction → postprocessing → structured output. Source: <a href="https://learn.microsoft.com/azure/ai-services/content-understanding/overview">Microsoft Learn</a>.</figcaption></figure>
+  <div class="grid" style="margin-top:16px"><article class="card span4"><div class="kicker">Input</div><h3>Documents + multimodal content</h3><p>PDF, images, Office files, audio, and video—depending on analyzer and service limits.</p></article><article class="card span4"><div class="kicker">Analyzer</div><h3>Schema-driven extraction</h3><p>Extract values, classify categories, or generate summaries while preserving layout and grounding.</p></article><article class="card span4"><div class="kicker">Output</div><h3>JSON + Markdown</h3><p>Structured fields feed automation; layout-aware Markdown feeds chunking, vector indexing, and RAG.</p></article></div>
+  <div class="callout"><b>WorkIQ provenance check.</b> WorkIQ was used to discover internal Microsoft content, but the exact deck could not be accessed (403) and its resolved sensitivity was General—not Public. It is intentionally excluded. This public page uses the official Microsoft Learn visual above.</div>
+</section>
+
+<section id="scenario">
+  <div class="section-head"><div class="num">04</div><div><div class="eyebrow">Workshop scenario</div><h2>Ask a financial document—and prove the answer.</h2><p class="muted">A developer uploads a synthetic annual report, selects a page range, waits for an eight-stage asynchronous pipeline, then asks a grounded question. The UI must show evidence, not just prose.</p></div></div>
+  <div class="grid"><article class="card span6"><div class="kicker">Participant task</div><ol><li>Upload a synthetic PDF.</li><li>Select all pages, start/end, or advanced ranges.</li><li>Observe Queued → Analyze → Classify → Extract → Chunk → Embed → Index → Ready.</li><li>Ask a precise question.</li><li>Open the cited chunk and verify the claim.</li><li>Delete the document and confirm quota is released.</li></ol></article><article class="card span6"><div class="kicker">Definition of done</div><ul class="checklist"><li>Document reaches Ready with page/chunk/token metrics.</li><li>Extracted JSON matches the analyzer schema.</li><li>Answer includes only validated citation IDs.</li><li>No account keys, API keys, or client secrets.</li><li>Deployment uses immutable commit SHA image tags.</li><li>Smoke test creates, queries, cites, and deletes synthetic evidence.</li></ul></article></div>
+  <div class="callout"><b>Workshop narrative:</b> first ship the code through GitHub, then prove the deployed runtime with synthetic evidence. The frontend capture therefore appears only at the post-deployment verification checkpoint in Module 07.</div>
+</section>
+
+<section id="l400">
+  <div class="section-head"><div class="num">05</div><div><div class="eyebrow">Implementation deep dive</div><h2>Follow every byte, token, lease, and ETag.</h2><p class="muted">Participants read the implementation, correlate it with live telemetry, and reason about invariants under retries and concurrent updates. Every block maps directly to the reference repository.</p></div></div>
+
+  <div class="pricing card"><div class="kicker">Suggested 4-hour delivery plan</div><table><thead><tr><th>Module</th><th>Time</th><th>Hands-on outcome</th></tr></thead><tbody><tr><td>GitHub control plane</td><td>30 min</td><td>Trace branch rules, CI fan-out, CodeQL, OIDC claims, environment variables, and immutable SHA tags.</td></tr><tr><td>Upload and state machine</td><td>40 min</td><td>Call init/complete APIs; inspect user-delegation SAS, page ranges, atomic quota reservation, and ETag transitions.</td></tr><tr><td>Async ingestion internals</td><td>50 min</td><td>Trace Queue visibility, Blob lease fencing, polling, outbox dispatch, retry classification, and poison handling.</td></tr><tr><td>Content → vectors → Search</td><td>45 min</td><td>Inspect analyzer routing, Markdown chunking, embeddings, Search schema, HNSW, semantic configuration, and filters.</td></tr><tr><td>Grounded generation</td><td>35 min</td><td>Inspect hybrid retrieval, evidence packaging, GPT‑5 streaming, citation parsing, and server-side validation.</td></tr><tr><td>Operate and break it</td><td>40 min</td><td>Inject timeout/429/lease/conflict scenarios, query sanitized telemetry, verify recovery, deploy, and smoke test.</td></tr></tbody></table></div>
+
+  <div class="grid" style="margin-top:16px">
+    <article class="card span6"><div class="kicker">1 · Upload contract</div><h3>Two-phase upload, direct to Blob</h3><p><span class="mono">POST /api/uploads/init</span> atomically reserves document count and bytes, validates a PDF range, creates the document row, and returns a create/write-only user-delegation SAS. The browser uploads directly to Blob, then calls <span class="mono">POST /api/uploads/{id}/complete</span>.</p><ul><li>SAS lifetime: 15 minutes; clock-skew allowance: 5 minutes.</li><li>Per-file limit: 100 MB; session byte limit: 500 MB.</li><li>PDF range: 1-based, maximum 300 unique pages; REST wire field: <span class="mono">range</span>.</li><li>No storage account key or connection string crosses the app boundary.</li></ul></article>
+    <article class="card span6"><div class="kicker">2 · Session boundary</div><h3>Opaque cookie, hashed server key</h3><p>The API generates 32 random bytes, returns a 43-character base64url token in an HTTP-only cookie, and stores only <span class="mono">SHA-256(raw token)</span> as the 64-hex partition key. Sessions expire after 24 hours.</p><ul><li>Quota reservation and document creation share one Azure Table transaction.</li><li>Deleted documents release count and byte quota once at DELETING.</li><li>Document count defaults to 1,000; total bytes remain the practical bound.</li><li>Security cookie invariants are code-owned, not client-controlled.</li></ul></article>
+  </div>
+
+  <div class="callout"><b>State invariant.</b> A document is visible only outside DELETING/DELETED. A worker may mutate a record only while its Blob lease is valid, its message identity matches, the document is not expired, and the ETag transition succeeds.</div>
+  <div class="flow"><div><b>UPLOAD</b>awaiting_upload</div><div><b>QUEUE</b>queued</div><div><b>UNDERSTAND</b>analyzing → classified → extracted</div><div><b>INDEX</b>chunking → embedding → indexing</div><div><b>SERVE</b>ready | failed | deleting</div></div>
+
+  <div class="grid" style="margin-top:16px">
+    <article class="card span4"><div class="kicker">3 · Concurrency</div><h3>Lease + ETag fencing</h3><p>The document control Blob uses a 60-second lease renewed every 30 seconds. Repository writes use If-Match ETags. Lease loss or a stale ETag stops a worker from overwriting delete/retry transitions.</p></article>
+    <article class="card span4"><div class="kicker">4 · Delivery</div><h3>Queue + durable outbox</h3><p>Upload completion commits QUEUED state and an ingestion outbox record atomically. The dispatcher scans up to 100 unsent records every 5 seconds. Queue visibility is 120 seconds and renews every 60 seconds; this is independent of the 60/30-second Blob lease contract.</p></article>
+    <article class="card span4"><div class="kicker">5 · Recovery</div><h3>Bounded retry + poison</h3><p>Retryable 408/429/5xx, timeouts, lease loss, and transient artifacts use exponential backoff with jitter. After five dequeue attempts, a sanitized envelope goes to the poison queue.</p></article>
+  </div>
+
+  <div class="grid" style="margin-top:16px">
+    <article class="card span6"><div class="kicker">6 · Content Understanding REST</div><h3>Long-running operation, resumable result</h3><pre>POST /contentunderstanding/analyzers/{router}:analyze
+  ?api-version=2025-11-01
+{
+  "inputs": [{ "url": "&lt;short-lived SAS&gt;", "range": "1-3" }]
+}
+→ Operation-Location
+→ GET operation until Succeeded
+→ normalize category, markdown, fields, locators, pages, tokens</pre><p>Polling delays: 1, 2, 4, 8, 15, 30, 30, 30 seconds. A retry resumes the stored operation URL/result ID instead of starting duplicate analysis.</p></article>
+    <article class="card span6"><div class="kicker">7 · Analyzer routing</div><h3>One router, four extraction contracts</h3><p><span class="mono">business_document_router</span> classifies and routes documents:</p><ul><li><b>invoice</b> → workshop_invoice</li><li><b>receipt</b> → workshop_receipt</li><li><b>contract</b> → workshop_contract</li><li><b>general-business</b> → workshop_general_business</li></ul><p>Empty typed fields normalize to null; malformed or unknown field types fail closed.</p></article>
+  </div>
+
+  <div class="pricing card" style="margin-top:16px"><div class="kicker">8 · RAG data plane contract</div><table><thead><tr><th>Stage</th><th>Implementation contract</th><th>Failure to test</th></tr></thead><tbody><tr><td>Chunk</td><td><span class="mono">cl100k_base</span>; max 800 tokens; 120-token overlap; heading hierarchy and page/source locators; deterministic SHA-256 chunk ID.</td><td>Long paragraph splits sentence-first, then token windows.</td></tr><tr><td>Embed</td><td><span class="mono">text-embedding-3-large</span>; 3,072 dimensions; max 64 inputs; max 8,192 tokens per input/request; five transient attempts.</td><td>Oversized input fails non-retryable; 429/5xx retries.</td></tr><tr><td>Index</td><td><span class="mono">document-chunks</span>; HNSW + cosine; filterable sessionKey/documentId; title, sectionPath, content, expiresAt.</td><td>Partial batch result raises transient artifact error.</td></tr><tr><td>Retrieve</td><td>Session/document filter + text/vector hybrid query + semantic configuration; top 8 evidence chunks.</td><td>Cross-session document IDs produce no eligible evidence.</td></tr><tr><td>Generate</td><td>GPT‑5 stream, max 1,200 output tokens; evidence labeled S1–S8; only retrieved IDs are valid citations.</td><td>Unknown citation is rejected; no evidence returns a fixed fallback.</td></tr></tbody></table></div>
+
+  <div class="grid" style="margin-top:16px">
+    <article class="card span6"><div class="kicker">9 · Identity and RBAC</div><h3>Separate runtime, pull, and deployment identities</h3><ul><li><b>App identity:</b> Blob/Queue/Table Data Contributor, Search Index Data Contributor, Cognitive Services OpenAI User, Content Understanding Owner.</li><li><b>ACR pull identity:</b> only pulls immutable images.</li><li><b>GitHub OIDC principal:</b> short-lived federation for release and bootstrap; no client secret.</li><li><b>Foundry identity:</b> invokes attached model deployments.</li></ul></article>
+    <article class="card span6"><div class="kicker">10 · Data lifecycle</div><h3>Tombstone first, erase under lease</h3><p>DELETE immediately transitions the record to DELETING and hides it. The cleanup job acquires the same document lease, removes Blob artifacts and Search chunks, marks DELETED, then hard-purges the Table row after 48 hours.</p><p>Run cleanup manually to prove idempotency and verify that a concurrent worker cannot recreate deleted evidence.</p></article>
+  </div>
+
+  <div class="pricing card" style="margin-top:16px"><div class="kicker">Failure-injection matrix</div><table><thead><tr><th>Inject</th><th>Expected classification</th><th>Evidence to collect</th></tr></thead><tbody><tr><td>Content Understanding 429/503</td><td><span class="success">retryable</span> dependency unavailable</td><td>dequeue count, retry delay, same operation/result ID</td></tr><tr><td>Polling window expires</td><td><span class="success">retryable</span> content_understanding_poll_timeout</td><td>document remains ANALYZING; message deferred</td></tr><tr><td>Blob lease lost</td><td><span class="success">retryable</span> dependency_unavailable</td><td>no later write with a stale lease</td></tr><tr><td>Azure Table ETag conflict</td><td>bounded conflict retry or safe stop</td><td>winning state preserved; no resurrection</td></tr><tr><td>Embedding input &gt; 8,192 tokens</td><td><span class="warning">non-retryable</span> embedding_input_too_large</td><td>FAILED; no content in telemetry</td></tr><tr><td>Fifth failed delivery</td><td>poison envelope</td><td>document/correlation/code/attempts only</td></tr></tbody></table></div>
+  <div class="callout"><b>Observability rule:</b> Application Insights records role, release SHA, dependency status/duration, correlation ID, safe failure code, retryability, and exception type. Redaction removes authorization, cookies, SAS query strings, prompts, extraction payloads, document content, and URL fragments before export.</div>
+</section>
+
+<section id="architecture">
+  <div class="section-head"><div class="num">06</div><div><div class="eyebrow">Architecture · editable source included</div><h2>Separate the release path from the evidence path.</h2><p class="muted">The rose lane is CI/CD: branch, PR, required checks, OIDC, build, push, and revision. The blue lane is runtime: upload, asynchronous analysis, embedding, indexing, retrieval, and grounded answer.</p></div></div>
+  <figure class="figure"><object data="assets/content-understanding-rag-architecture.svg" type="image/svg+xml" aria-label="Architecture diagram showing GitHub CI/CD and Azure runtime services"></object><figcaption class="caption">Original workshop diagram using Azure icons from the draw.io Azure stencil library. <a href="assets/content-understanding-rag-architecture.svg" download>Download SVG</a> · <a href="assets/content-understanding-rag-architecture.drawio" download>Download editable .drawio</a>.</figcaption></figure>
+  <div class="grid" style="margin-top:16px"><article class="card span6"><div class="kicker">Southeast Asia</div><h3>Application and data plane</h3><p>Frontend, API, scale-to-zero worker, cleanup job, Storage, AI Search, ACR, and Application Insights.</p></article><article class="card span6"><div class="kicker">East US 2</div><h3>AI processing plane</h3><p>Microsoft Foundry hosts GPT‑5 and text-embedding-3-large. Regional data flow must be approved before use.</p></article></div>
+</section>
+
+<section id="deploy">
+  <div class="section-head"><div class="num">07</div><div><div class="eyebrow">Step-by-step deployment</div><h2>Bootstrap once. Release only from GitHub.</h2><p class="muted">The one-time helper provisions validated Bicep and may use ACR Tasks for initial non-release bootstrap or troubleshooting. Every subsequent production release is built only on GitHub-hosted runners—not laptops or ACR Tasks—and Azure login uses OIDC.</p></div></div>
+  <div class="callout"><b>Safety:</b> use synthetic, non-confidential documents. Confirm Southeast Asia → East US 2 processing approval. The local deployer needs resource deployment and role-assignment permissions.</div>
+
+  <article class="card" style="margin-bottom:20px">
+    <div class="kicker">Preparation · before the Git evidence trail</div>
+    <h3>Provision the platform and connect GitHub once</h3>
+    <p>This preparation is completed by the facilitator before participants start the branch-to-production sequence. The first helper can use ACR Tasks only for non-release bootstrap. It creates Bicep resources, managed identities, RBAC, the GitHub <span class="mono">production</span> environment, OIDC federation, non-secret variables, and the branch ruleset.</p>
+    <div class="grid"><div class="span6"><pre><button class="copy">copy</button>az login
+az account set --subscription &lt;subscription-id&gt;
+./scripts/deploy.ps1 -WhatIf
+./scripts/deploy.ps1 `
+  -EnvironmentName cudemo `
+  -Subscription &lt;subscription-id&gt;</pre></div><div class="span6"><pre><button class="copy">copy</button>./scripts/configure-github.ps1 `
+  -Repo &lt;owner/repository&gt; `
+  -AzureClientId &lt;client-id&gt; `
+  -AzureTenantId &lt;tenant-id&gt; `
+  -AzureSubscriptionId &lt;subscription-id&gt;</pre></div></div>
+    <p><b>Preparation exit criterion:</b> Bicep deployment succeeds; GitHub shows a protected <span class="mono">main</span> branch, a <span class="mono">production</span> environment, OIDC variables, and required CI/CodeQL checks. No client secret is created.</p>
+  </article>
+
+  <div class="callout"><b>One retrospective evidence thread:</b> checkpoints 01–07 reconstruct the completed PR #15 from its durable GitHub records: current repository state, feature commit <span class="mono">dc77911</span>, archived pull request, CI/CodeQL runs, squash merge <span class="mono">7763b09</span>, deployment run <span class="mono">33872688415</span>, and runtime verification. The screenshots are post-completion evidence aligned to each action—not a claim that every screen was captured live before merge.</div>
+  <div class="steps">
+    <article class="step"><div>
+      <h3>Establish the source of truth</h3>
+      <p><b>Action.</b> Clone the public repository, inspect <span class="mono">main</span>, and identify the deployment contract in <span class="mono">.github/workflows</span>, <span class="mono">infra/main.bicep</span>, and <span class="mono">docs/deployment.md</span>.</p>
+      <pre><button class="copy">copy</button>git clone https://github.com/ibranibeny/content-understanding-rag-demo.git
+cd content-understanding-rag-demo
+git switch main
+git pull --ff-only</pre>
+      <figure class="figure"><img src="assets/git-01-repository.png" alt="GitHub repository code view on the main branch" loading="lazy"/><figcaption class="caption"><b>Retrospective evidence.</b> This post-merge repository view establishes public provenance and the current <span class="mono">main</span> source of truth. Use the file tree to locate application, analyzer, infrastructure, workflow, script, and test boundaries; use local Git history—not this screenshot—as the pre-change baseline.</figcaption></figure>
+      <p><b>Exit criterion.</b> Local HEAD equals <span class="mono">origin/main</span>; no uncommitted changes; participant can locate CI, Deploy, Bicep, analyzer, backend, and frontend entry points.</p>
+    </div></article>
+
+    <article class="step"><div>
+      <h3>Create one atomic branch and commit</h3>
+      <p><b>Action.</b> Create a focused branch, make one bounded change, run targeted/full verification, and commit the evidence-bearing unit.</p>
+      <pre><button class="copy">copy</button>git switch -c feat/my-change
+# edit, then run the relevant tests
+git status --short
+git diff --check
+git add &lt;changed-files&gt;
+git commit -m "feat(scope): describe the behavior"</pre>
+      <figure class="figure"><img src="assets/git-02-commit.png" alt="GitHub commit view showing a feature branch, commit message, checks, and code diff" loading="lazy"/><figcaption class="caption"><b>Retrospective evidence.</b> GitHub can display this view only after the local commit is pushed. Commit <span class="mono">dc77911</span> preserves the atomic subject, feature branch, changed files, patch, and checks for the branch-and-commit action above.</figcaption></figure>
+      <p><b>Exit criterion.</b> Commit explains one behavior, contains no generated secrets/binaries, passes local checks, and can be reverted independently.</p>
+    </div></article>
+
+    <article class="step"><div>
+      <h3>Open a pull request with test evidence</h3>
+      <p><b>Action.</b> Push the branch and open a PR that records the problem, architecture impact, security boundary, test commands, expected runtime behavior, and rollback path.</p>
+      <pre><button class="copy">copy</button>git push -u origin feat/my-change
+gh pr create --base main --fill</pre>
+      <figure class="figure"><img src="assets/git-03-pull-request.png" alt="Archived merged GitHub pull request showing source branch, main target, description, commits, checks, and changed files" loading="lazy"/><figcaption class="caption"><b>Retrospective evidence.</b> This is the archived final state of PR #15 after merge. It preserves the source/target branches, rationale, test evidence, commits, and changed-file review surface created during the pull-request action.</figcaption></figure>
+      <p><b>Exit criterion.</b> PR is reviewable without private context; every acceptance criterion maps to code/tests; the diff contains only intended files.</p>
+    </div></article>
+
+    <article class="step"><div>
+      <h3>Pass required CI, security, and IaC gates</h3>
+      <p><b>Action.</b> Inspect—not merely wait for—the backend, frontend, Bicep, policy-test, Python analysis, JavaScript/TypeScript analysis, and CodeQL results. Treat a red check as evidence, not noise.</p>
+      <pre><button class="copy">copy</button>gh pr checks &lt;pr-number&gt; --watch
+gh run view &lt;run-id&gt; --log-failed</pre>
+      <div class="grid">
+        <figure class="figure span6"><img src="assets/git-04a-ci-jobs.png" alt="Successful CI workflow run showing backend, frontend, and Bicep jobs" loading="lazy"/><figcaption class="caption"><b>CI evidence.</b> The real pull-request run is green and visibly lists backend, frontend, and Bicep jobs. Open a job or the workflow file to inspect its individual commands; the screenshot proves job-level completion, not every hidden log line.</figcaption></figure>
+        <figure class="figure span6"><img src="assets/git-04b-codeql-jobs.png" alt="Successful CodeQL workflow run showing two completed analysis jobs" loading="lazy"/><figcaption class="caption"><b>CodeQL evidence.</b> The companion pull-request run is green and reports two completed analysis jobs; the run navigation identifies Python and JavaScript/TypeScript analysis.</figcaption></figure>
+      </div>
+      <p><b>Exit criterion.</b> The CI and CodeQL run pages identify feature commit <span class="mono">dc77911</span> and report Success. Separately confirm in repository rules that these workflow checks are required before merge; the screenshots prove run results, not ruleset configuration or bypass history.</p>
+    </div></article>
+
+    <article class="step"><div>
+      <h3>Merge the reviewed change into protected main</h3>
+      <p><b>Action.</b> Squash-merge after required checks and any human approval required by the repository's current policy. PR #15 had no review approval requirement, so its durable evidence is the successful checks and merge record. Record the resulting main-branch SHA because that SHA becomes the immutable image tag and release correlation key.</p>
+      <pre><button class="copy">copy</button>gh pr merge &lt;pr-number&gt; --squash
+git fetch origin
+git show --stat origin/main</pre>
+      <figure class="figure"><img src="assets/git-05-merge-main.png" alt="Verified squash merge commit on the main branch" loading="lazy"/><figcaption class="caption"><b>What to read.</b> Verified merge commit <span class="mono">7763b09</span> is now on <span class="mono">main</span>. This establishes the exact source revision allowed to enter the production workflow.</figcaption></figure>
+      <p><b>Exit criterion.</b> PR state is merged, merge commit is reachable from <span class="mono">origin/main</span>, and the release workflow was triggered by that push—not by a developer laptop.</p>
+    </div></article>
+
+    <article class="step"><div>
+      <h3>Release the merge SHA with GitHub Actions OIDC</h3>
+      <p><b>Action.</b> Follow deployment run <span class="mono">33872688415</span>. The runner exchanges its GitHub OIDC token for Azure access, builds backend/frontend images tagged with <span class="mono">GITHUB_SHA</span>, pushes ACR, updates Container Apps, gates revisions, bootstraps Content Understanding/Search, verifies the proxy, and executes two smoke tests.</p>
+      <pre><button class="copy">copy</button>gh run list --workflow Deploy --branch main
+gh run watch &lt;deploy-run-id&gt; --exit-status</pre>
+      <figure class="figure"><img src="assets/github-actions-deploy-success.png" alt="GitHub Actions deploy run summary showing a push of merge commit 7763b09 to main with Success status" loading="lazy"/><figcaption class="caption"><b>Trigger evidence.</b> The run summary visibly ties this release to a push of commit <span class="mono">7763b09</span> on <span class="mono">main</span> and reports Success. This is the evidence that the deploy was merge-triggered.</figcaption></figure>
+      <div class="grid" style="margin-top:16px">
+        <figure class="figure span6"><img src="assets/git-06-deploy.png" alt="Successful GitHub Actions deployment showing Azure OIDC, ACR image build and push, and Container Apps revision steps" loading="lazy"/><figcaption class="caption"><b>Deployment step evidence.</b> The visible step names show OIDC login, ACR authentication, GitHub-runner image build, image push, and Container Apps update. Confirm the actual image SHA with Azure CLI.</figcaption></figure>
+        <figure class="figure span6"><img src="assets/github-actions-cicd-full.png" alt="Complete successful deployment job showing revision gate, data-plane bootstrap, frontend readiness, and smoke test" loading="lazy"/><figcaption class="caption"><b>Release-gate evidence.</b> The lower steps visibly show the revision wait, Content Understanding/Search bootstrap, frontend proxy readiness, and Smoke test all completed successfully.</figcaption></figure>
+      </div>
+      <pre><button class="copy">copy</button># Verify the deployed image tag matches the merge SHA
+    az containerapp show -g &lt;resource-group&gt; -n &lt;app-name&gt; `
+      --query "properties.template.containers[0].image" -o tsv</pre>
+      <p><b>Exit criterion.</b> Workflow conclusion is success; the Azure CLI result ends with the merge SHA; revision provisioning is healthy; Bootstrap, proxy readiness, and Smoke test steps are green.</p>
+    </div></article>
+
+    <article class="step"><div>
+      <h3>Verify the deployed application sequentially</h3>
+      <p><b>Action.</b> Only after the deployment is green, open the production frontend. Upload the synthetic Contoso PDF, select the page range, and correlate the UI state machine with backend telemetry: Queued → Analyze → Classify → Extract → Chunk → Embed → Index → Ready.</p>
+      <pre><button class="copy">copy</button>uv --project backend run python scripts/smoke_test.py `
+  --api-base &lt;frontend-url&gt; `
+  --frontend-origin &lt;frontend-url&gt;
+
+# Browser verification follows the automated smoke test.</pre>
+      <figure class="figure"><img src="assets/frontend-ready-pipeline.png" alt="Full Document Intelligence Console showing synthetic Contoso evidence, all eight pipeline stages Ready, extraction JSON, grounded chat, and citation" loading="lazy"/><figcaption class="caption"><b>Full-application runtime evidence.</b> This uncropped Playwright capture shows header disclosures, upload control, synthetic document list, all eight Ready states, range 1–3, 3 pages, 5 chunks, 3,072-dimensional vectors, 2,673 tokens, safe extraction JSON, grounded answer, and citation S1.</figcaption></figure>
+      <p><b>Exit criterion.</b> Synthetic document reaches Ready; expected page range is honored; extracted JSON is present; vector dimension is 3,072; a grounded question returns only validated citation IDs; delete hides the document and releases quota.</p>
+    </div></article>
+
+    <article class="step"><div>
+      <h3>Operate, clean up, and retain evidence</h3>
+      <p><b>Action.</b> Record the merge SHA, deployment run URL, smoke-test correlation ID, and Application Insights trace. Run cleanup to verify tombstone/lease behavior. Remove the environment only after the workshop retention decision.</p>
+      <pre><button class="copy">copy</button>az containerapp job start `
+  --name &lt;cleanup-job&gt; `
+  --resource-group &lt;resource-group&gt;
+
+azd env select cudemo
+azd down --purge --force</pre>
+      <p><b>Exit criterion.</b> Cleanup execution succeeds; deleted/expired documents are absent from Blob and Search; retained evidence contains no cookie, bearer token, SAS query, prompt, or document payload.</p>
+    </div></article>
+  </div>
+</section>
+
+<section id="sources">
+  <div class="section-head"><div class="num">↗</div><div><div class="eyebrow">Primary sources</div><h2>Grounded in public documentation and executable code.</h2><p class="muted">Product behavior and prices change. Re-open the linked sources before delivering the workshop.</p></div></div>
+  <div class="grid"><article class="card span6"><h3>Microsoft Learn</h3><ul class="source-list"><li><a href="https://learn.microsoft.com/training/modules/introduction-to-github/">Introduction to GitHub</a></li><li><a href="https://learn.microsoft.com/dotnet/devops/github-actions-overview">GitHub Actions overview</a></li><li><a href="https://learn.microsoft.com/azure/container-apps/github-actions">Deploy Container Apps with GitHub Actions</a></li><li><a href="https://learn.microsoft.com/azure/ai-services/content-understanding/overview">Content Understanding overview</a></li><li><a href="https://learn.microsoft.com/azure/ai-services/content-understanding/document/overview">Content Understanding document solutions</a></li></ul></article><article class="card span6"><h3>GitHub + reference implementation</h3><ul class="source-list"><li><a href="https://docs.github.com/en/copilot/get-started/plans">Copilot plans and AI credits</a></li><li><a href="https://github.com/features/copilot/plans">Copilot pricing page</a></li><li><a href="https://github.com/ibranibeny/content-understanding-rag-demo">Workshop application source</a></li><li><a href="https://github.com/ibranibeny/content-understanding-rag-demo/actions">CI/CD workflow runs</a></li><li><a href="https://github.com/jgraph/drawio">draw.io and Azure stencil icons</a></li></ul></article></div>
+</section>
+<footer class="footer"><span>Content Understanding × GitHub Developer Workshop</span><span>Public guidance · no internal deck content included</span></footer>
+</main></div>
+<script>
+const links=[...document.querySelectorAll('nav a[href^="#"]')];const sections=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id))}})},{rootMargin:'-25% 0px -65% 0px'});sections.forEach(s=>obs.observe(s));document.querySelectorAll('.copy').forEach(b=>b.addEventListener('click',async()=>{const p=b.parentElement;const text=[...p.childNodes].filter(n=>n!==b).map(n=>n.textContent).join('').trim();await navigator.clipboard.writeText(text);b.textContent='copied';setTimeout(()=>b.textContent='copy',1200)}));
+</script>
+</body></html>
