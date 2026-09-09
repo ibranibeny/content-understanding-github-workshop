@@ -120,7 +120,14 @@ Read the diagram from left to right along the GitHub lane first, then traverse t
 ![Azure architecture for the workshop](assets/content-understanding-rag-architecture.svg)
 
 - [Download the SVG architecture](assets/content-understanding-rag-architecture.svg)
+- [Download the JPG architecture (3400×2360)](assets/content-understanding-rag-architecture.jpg)
 - [Download the editable Draw.io architecture](assets/content-understanding-rag-architecture.drawio)
+- Regenerate the SVG and `.drawio`: `python build_architecture.py`
+- Re-export the JPG: `npx sharp-cli -i assets/content-understanding-rag-architecture.svg -o assets/ -f jpeg -q 92 resize 3400 -- flatten "#f7f4ef"`
+
+The diagram uses two icon families on purpose. GitHub brand marks identify the six controls where a human or a policy decides whether a change may exist, and official Azure marks take over from Container Registry onwards, where the change becomes running infrastructure. A participant can therefore tell at a glance whether a box governs a decision or executes it.
+
+The ten numbered badges encode the order in which evidence is created. Steps 1 to 3 establish the session and authorize the upload, step 4 shows the browser writing bytes straight to Blob Storage, and step 5 hands work to the worker under a Blob lease. Steps 6 and 7 turn the document into durable evidence through Foundry and Azure AI Search, steps 8 and 9 form the answering loop, and step 10 with the dashed telemetry line closes the lifecycle.
 
 ```mermaid
 flowchart TB
